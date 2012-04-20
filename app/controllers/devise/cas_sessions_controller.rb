@@ -1,5 +1,6 @@
 class Devise::CasSessionsController < Devise::SessionsController  
   unloadable
+  protect_from_forgery :except => :single_sign_out 
   
   def new
     unless returning_from_cas?
