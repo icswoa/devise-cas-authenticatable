@@ -11,7 +11,7 @@ module DeviseCasAuthenticatable
           set_session_without_storage(env, sid, session_data, options)
         else
           set_session_without_storage(env, sid, session_data)
-        end        
+        end
       end
     end
   end

@@ -7,12 +7,8 @@ require 'devise_cas_authenticatable/exceptions'
 
 require 'devise_cas_authenticatable/single_sign_out'
 
-if defined?(ActiveRecord::SessionStore)
+if defined?(::ActiveRecord::SessionStore)
   require 'devise_cas_authenticatable/single_sign_out/session_store/active_record'
-end
-
-if defined?(Redis::Store)
-  require 'devise_cas_authenticatable/single_sign_out/session_store/redis'
 end
 
 require 'rubycas-client'
@@ -24,6 +20,11 @@ rescue
 else
   module DeviseCasAuthenticatable
     class Engine < Rails::Engine
+      initializer "devise_cas_authenticatable.environment" do |app|
+        if defined?(::ActiveRecord::SessionStore)
+          require 'devise_cas_authenticatable/single_sign_out/session_store/active_record'
+        end
+      end
     end
   end
 end
@@ -32,13 +33,13 @@ module Devise
   # The base URL of the CAS server.  For example, http://cas.example.com.  Specifying this
   # is mandatory.
   @@cas_base_url = nil
-  
+
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_login_url = nil
-  
+
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_logout_url = nil
-  
+
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_validate_url = nil
 
@@ -63,14 +64,14 @@ module Devise
   # Should devise_cas_authenticatable attempt to create new user records for
   # unknown usernames?  True by default.
   @@cas_create_user = true
-  
+
   # The model attribute used for query conditions. Should be the same as
   # the rubycas-server username_column. :username by default
   @@cas_username_column = :username
 
-  # Name of the parameter passed in the logout query 
+  # Name of the parameter passed in the logout query
   @@cas_destination_logout_param_name = nil
-  
+
   # Additional options for CAS client object
   @@cas_client_config_options = {}
 
@@ -91,21 +92,21 @@ module Devise
         :validate_url => @@cas_validate_url,
         :enable_single_sign_out => @@cas_enable_single_sign_out
       }
-      
+
       cas_options.merge!(@@cas_client_config_options) if @@cas_client_config_options
-      
+
       CASClient::Client.new(cas_options)
     end
   end
-  
+
   def self.cas_service_url(base_url, mapping)
     cas_action_url(base_url, mapping, "service")
   end
-  
+
   def self.cas_unregistered_url(base_url, mapping)
     cas_action_url(base_url, mapping, "unregistered")
   end
-  
+
   private
   def self.cas_action_url(base_url, mapping, action)
     u = URI.parse(base_url)
