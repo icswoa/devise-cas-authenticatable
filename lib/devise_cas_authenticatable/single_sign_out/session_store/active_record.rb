@@ -10,6 +10,7 @@ module DeviseCasAuthenticatable
   end
 end
 
+# Gem.loaded_specs.map{ |(name, gem)| p name }
 ActiveRecord::SessionStore.class_eval do
   include DeviseCasAuthenticatable::SingleSignOut::SetSession
   alias_method_chain :set_session, :storage

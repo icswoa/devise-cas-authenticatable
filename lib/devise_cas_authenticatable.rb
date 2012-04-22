@@ -19,7 +19,23 @@ begin
 rescue
 else
   module DeviseCasAuthenticatable
+    class RackSession
+      def initialize(app)
+        @app = app
+      end
+
+      def call(env)
+        Rails.logger.debug "foo"
+        Rails.logger.debug env
+        status, headers, response = @app.call(env)
+        [status, headers, "<!-- Response Time: ... -->\n" + response.body]
+      end
+    end
+
     class Engine < Rails::Engine
+
+      # config.app_middleware.use(DeviseCasAuthenticatable::RackSession)
+
       initializer "devise_cas_authenticatable.environment" do |app|
         if defined?(::ActiveRecord::SessionStore)
           require 'devise_cas_authenticatable/single_sign_out/session_store/active_record'
