@@ -16,6 +16,7 @@ module Devise
         #   pass in the ticket's extra_attributes hash.
         # * Return the resulting user object.
         def authenticate_with_cas_ticket(ticket)
+          Rails.logger.debug ticket.to_yaml
           ::Devise.cas_client.validate_service_ticket(ticket) unless ticket.has_been_validated?
           
           if ticket.is_valid?
