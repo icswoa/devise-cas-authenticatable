@@ -6,7 +6,7 @@ module DeviseCasAuthenticatable
     end
 
     # Supports destroying sessions by ID for ActiveRecord and Redis session stores
-    module destroy_session_by_id
+    module DestroySession
       def session_store_class
         @session_store_class ||=
           begin
