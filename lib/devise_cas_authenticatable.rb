@@ -54,6 +54,8 @@ module Devise
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_logout_url = nil
 
+  @@cas_use_ssl = nil
+
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_validate_url = nil
 
