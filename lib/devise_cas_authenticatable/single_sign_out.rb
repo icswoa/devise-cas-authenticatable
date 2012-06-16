@@ -21,23 +21,34 @@ module DeviseCasAuthenticatable
       end
 
       def current_session_store
-        app = Rails.application.app
-        begin
-          app = app.instance_variable_get :@app
-        end until app.nil? or app.class == session_store_class
-        app
+        if ::DeviseCasAuthenticatable::SingleSignOut.rails3?
+          app = Rails.application.app
+          begin
+            app = app.instance_variable_get :@app
+          end until app.nil? or app.class == session_store_class
+          app
+        else
+          ActionController::Base.session_store.new :fm, ActionController::Base.session_options
+        end
       end
 
       def destroy_session_by_id(sid)
         if (defined?(ActiveRecord) && session_store_class == ActiveRecord::SessionStore)
+          Rails.logger.debug "ActiveRecord::SessionStore logout"
           session = current_session_store::Session.find_by_session_id(sid)
           session.destroy if session
           true
         elsif session_store_class.name =~ /RedisSessionStore/
-          pool = current_session_store.instance_variable_get(:@pool)
-          pool && pool.del(sid)
+          Rails.logger.debug "RedisSessionStore logout"
+          if ::DeviseCasAuthenticatable::SingleSignOut.rails3?
+            pool = current_session_store.instance_variable_get(:@pool)
+            pool && pool.del(sid)
+          else
+            current_session_store.destroy_with_sid sid
+          end
           true
         elsif session_store_class.name =~ /RedisStore/
+          Rails.logger.debug "RedisStore logout"
           pool = current_session_store.instance_variable_get(:@pool)
           pool && pool.del(sid)
           true

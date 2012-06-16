@@ -19,7 +19,7 @@ module DeviseCasAuthenticatable
 
         if session['cas_last_valid_ticket_store']
           sid = env['rack.session.options'][:id]
-          Rails.logger.info "Storing sid #{sid} for ticket #{session['cas_last_valid_ticket']}"
+          Rails.logger.info "Rack: Storing sid #{sid} for ticket #{session['cas_last_valid_ticket']}"
           ::DeviseCasAuthenticatable::SingleSignOut::Strategies.current_strategy.store_session_id_for_index(session['cas_last_valid_ticket'], sid)
           session['cas_last_valid_ticket_store'] = false
         end
