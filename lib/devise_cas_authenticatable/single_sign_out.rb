@@ -22,9 +22,9 @@ module DeviseCasAuthenticatable
 
       def current_session_store
         if ::DeviseCasAuthenticatable::SingleSignOut.rails3?
-          Rails.application.config.session_store.new Rails.application.class.to_sym, Rails.application.config.session_options
+          session_store_class.new :app, Rails.application.config.session_options
         else
-          ActionController::Base.session_store.new :fm, ActionController::Base.session_options
+          session_store_class.new :app, ActionController::Base.session_options
         end
       end
 
