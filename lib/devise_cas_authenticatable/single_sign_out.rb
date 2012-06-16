@@ -6,7 +6,7 @@ module DeviseCasAuthenticatable
     end
 
     # Supports destroying sessions by ID for ActiveRecord and Redis session stores
-    module DestroySession
+    module destroy_session_by_id
       def session_store_class
         @session_store_class ||=
           begin
@@ -22,11 +22,7 @@ module DeviseCasAuthenticatable
 
       def current_session_store
         if ::DeviseCasAuthenticatable::SingleSignOut.rails3?
-          app = Rails.application.app
-          begin
-            app = app.instance_variable_get :@app
-          end until app.nil? or app.class == session_store_class
-          app
+          Rails.application.config.session_store.new Rails.application.class.to_sym, Rails.application.config.session_options
         else
           ActionController::Base.session_store.new :fm, ActionController::Base.session_options
         end
