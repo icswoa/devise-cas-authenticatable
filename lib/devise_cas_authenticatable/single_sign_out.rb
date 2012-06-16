@@ -34,10 +34,12 @@ module DeviseCasAuthenticatable
           session.destroy if session
           true
         elsif session_store_class.name =~ /RedisSessionStore/
-          current_session_store.instance_variable_get(:@pool).del(sid)
+          pool = current_session_store.instance_variable_get(:@pool)
+          pool && pool.del(sid)
           true
         elsif session_store_class.name =~ /RedisStore/
-          current_session_store.instance_variable_get(:@pool).del(sid)
+          pool = current_session_store.instance_variable_get(:@pool)
+          pool && pool.del(sid)
           true
         else
           Rails.logger.error "Cannot process logout request because this Rails application's session store is "+
