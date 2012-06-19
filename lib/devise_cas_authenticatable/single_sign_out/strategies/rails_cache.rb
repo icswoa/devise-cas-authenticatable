@@ -2,27 +2,31 @@ module DeviseCasAuthenticatable
   module SingleSignOut
     module Strategies
       class RailsCache < Base
-          def store_session_id_for_index(session_index, session_id)
-            logger.debug("RailsCache: Storing #{session_id} for index #{session_index}")
-            Rails.cache.write(cache_key(session_index), session_id)
-          end
+        class << self
+          attr_accessor :namespace
+        end
 
-          def find_session_id_by_index(session_index)
-            sid = Rails.cache.read(cache_key(session_index))
-            logger.debug("RailsCache: Found session id #{sid} for index #{session_index}")
-            sid
-          end
+        def store_session_id_for_index(session_index, session_id)
+          logger.debug("RailsCache: Storing #{session_id} for index #{cache_key(session_index)}")
+          Rails.cache.write(cache_key(session_index), session_id)
+        end
 
-          def delete_session_index(session_index)
-            logger.debug("RailsCache: Deleting index #{session_index}")
-            Rails.cache.delete(cache_key(session_index))
-          end
+        def find_session_id_by_index(session_index)
+          sid = Rails.cache.read(cache_key(session_index))
+          logger.debug("RailsCache: Found session id #{sid} for index #{cache_key(session_index)}")
+          sid
+        end
 
-          private
+        def delete_session_index(session_index)
+          Rails.cache.delete(cache_key(session_index))
+          logger.debug("RailsCache: Deleting index #{cache_key(session_index)}")
+        end
 
-          def cache_key(session_index)
-            "devise_cas_authenticatable:#{session_index}"
-          end
+        private
+
+        def cache_key(session_index)
+          Rails.cache.read session_index
+        end
       end
     end
   end
