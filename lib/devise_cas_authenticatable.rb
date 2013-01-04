@@ -36,7 +36,7 @@ else
 
       initializer "devise_cas_authenticatable.environment" do |app|
         if defined?(::ActiveRecord::SessionStore)
-          require 'devise_cas_authenticatable/single_sign_out/session_store/active_record'
+          # require 'devise_cas_authenticatable/single_sign_out/session_store/active_record'
         end
       end
     end
