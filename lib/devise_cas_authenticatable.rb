@@ -1,6 +1,5 @@
 require 'devise'
 
-require 'devise_cas_authenticatable/schema'
 require 'devise_cas_authenticatable/routes'
 require 'devise_cas_authenticatable/strategy'
 require 'devise_cas_authenticatable/exceptions'
