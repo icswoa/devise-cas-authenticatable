@@ -26,6 +26,8 @@ module Devise
   # is mandatory.
   @@cas_base_url = nil
 
+  @@cas_use_ssl = false
+
   # The login URL of the CAS server.  If undefined, will default based on cas_base_url.
   @@cas_login_url = nil
 
@@ -67,7 +69,7 @@ module Devise
   # Additional options for CAS client object
   @@cas_client_config_options = {}
 
-  mattr_accessor :cas_base_url, :cas_login_url, :cas_logout_url, :cas_validate_url, :cas_destination_url, :cas_follow_url, :cas_logout_url_param, :cas_create_user, :cas_destination_logout_param_name, :cas_username_column, :cas_enable_single_sign_out, :cas_single_sign_out_mapping_strategy, :cas_client_config_options
+  mattr_accessor :cas_use_ssl, :cas_base_url, :cas_login_url, :cas_logout_url, :cas_validate_url, :cas_destination_url, :cas_follow_url, :cas_logout_url_param, :cas_create_user, :cas_destination_logout_param_name, :cas_username_column, :cas_enable_single_sign_out, :cas_single_sign_out_mapping_strategy, :cas_client_config_options
 
   def self.cas_create_user?
     cas_create_user
@@ -103,6 +105,9 @@ module Devise
   def self.cas_action_url(base_url, mapping, action)
     u = URI.parse(base_url)
     u.query = nil
+    if @@cas_use_ssl
+      u.scheme = "https"
+    end
     u.path = if mapping.respond_to?(:fullpath)
       if ENV['RAILS_RELATIVE_URL_ROOT']
         ENV['RAILS_RELATIVE_URL_ROOT'] + mapping.fullpath
