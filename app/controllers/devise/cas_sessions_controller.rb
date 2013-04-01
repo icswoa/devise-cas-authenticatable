@@ -3,11 +3,10 @@ class Devise::CasSessionsController < Devise::SessionsController
   unloadable
 
   skip_before_filter :verify_authenticity_token, :only => [:single_sign_out]
-  skip_before_filter :authenticate_user!, except: [:destroy, :single_sign_out]
 
   def new
     unless returning_from_cas?
-      redirect_to(cas_login_url)
+      redirect_to(cas_login_url, status: 302)
     end
   end
 
