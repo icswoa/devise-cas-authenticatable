@@ -1,23 +1,24 @@
-class Devise::CasSessionsController < Devise::SessionsController  
+class Devise::CasSessionsController < Devise::SessionsController
   include DeviseCasAuthenticatable::SingleSignOut::DestroySession
   unloadable
 
   skip_before_filter :verify_authenticity_token, :only => [:single_sign_out]
+  before_filter :require_no_authentication, :only => :new
 
   def new
     unless returning_from_cas?
       redirect_to(cas_login_url)
     end
   end
-  
+
   def service
     warden.authenticate!(:scope => resource_name)
     redirect_to after_sign_in_path_for(resource_name)
   end
-  
+
   def unregistered
   end
-  
+
   def destroy
     # if :cas_create_user is false a CAS session might be open but not signed_in
     # in such case we destroy the session here
@@ -37,7 +38,7 @@ class Devise::CasSessionsController < Devise::SessionsController
         destination_url << after_sign_out_path_for(resource_name)
       end
     end
-    
+
     if ::Devise.cas_logout_url_param == 'follow'
       if !::Devise.cas_follow_url.blank?
         follow_url = Devise.cas_follow_url
@@ -48,7 +49,7 @@ class Devise::CasSessionsController < Devise::SessionsController
         follow_url << after_sign_out_path_for(resource_name)
       end
     end
-    
+
     redirect_to(::Devise.cas_client.logout_url(destination_url, follow_url))
   end
 
@@ -96,7 +97,7 @@ class Devise::CasSessionsController < Devise::SessionsController
   def returning_from_cas?
     params[:ticket] || request.referer =~ /^#{::Devise.cas_client.cas_base_url}/
   end
-  
+
   def cas_login_url
     ::Devise.cas_client.add_service_to_login_url(::Devise.cas_service_url(request.url, devise_mapping))
   end
